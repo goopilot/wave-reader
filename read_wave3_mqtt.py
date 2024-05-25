@@ -51,12 +51,9 @@ class Wave2():
         scan_interval = 0.1
         timeout = 3
         scanner = btle.Scanner()
-        print(scanner)
         for _count in range(int(timeout / scan_interval)):
             advertisements = scanner.scan(scan_interval)
-            print(advertisements)
             for adv in advertisements:
-                print(adv)
                 if self.serial_number == _parse_serial_number(adv.getValue(btle.ScanEntry.MANUFACTURER)):
                     return adv.addr
         return None
@@ -67,7 +64,6 @@ class Wave2():
             tries += 1
             if self.mac_addr is None:
                 self.mac_addr = self.discover()
-                print(self.mac_addr)
             try:
                 self._periph = btle.Peripheral(self.mac_addr)
                 self._char = self._periph.getCharacteristics(uuid=self.CURR_VAL_UUID)[0]
@@ -145,7 +141,6 @@ def _main():
     while True:
         wave2.connect(retries=5)
         current_values = wave2.read()
-        print(current_values)
         client = paho.Client(callback_api_version=paho.CallbackAPIVersion.VERSION2, client_id="rpi5", userdata=None, protocol=paho.MQTTv311)
         client.username_pw_set(args.MQTT_USER,args.MQTT_PASSWORD)
         client.connect(args.MQTT_IP, 1883)
