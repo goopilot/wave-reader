@@ -51,9 +51,12 @@ class Wave2():
         scan_interval = 0.1
         timeout = 3
         scanner = btle.Scanner()
+        print(scanner)
         for _count in range(int(timeout / scan_interval)):
             advertisements = scanner.scan(scan_interval)
+            print(advertisements)
             for adv in advertisements:
+                print(adv)
                 if self.serial_number == _parse_serial_number(adv.getValue(btle.ScanEntry.MANUFACTURER)):
                     return adv.addr
         return None
