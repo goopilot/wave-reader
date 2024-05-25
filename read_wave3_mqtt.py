@@ -133,9 +133,9 @@ def _main():
     # args = _argparser()
     SERIAL_NUMBER = os.getenv('SERIAL_NUMBER')
     MQTT_USER = os.getenv('MQTT_USER')
-    MQTT_PASSWORD = int(os.getenv('MQTT_PASSWORD'))*60
+    MQTT_PASSWORD = os.getenv('MQTT_PASSWORD')
     MQTT_IP = os.getenv('MQTT_IP')
-    SAMPLE_PERIOD = os.getenv('SAMPLE_PERIOD')
+    SAMPLE_PERIOD = int(os.getenv('SAMPLE_PERIOD'))
     
     wave2 = Wave2(SERIAL_NUMBER)
 
