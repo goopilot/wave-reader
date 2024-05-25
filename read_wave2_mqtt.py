@@ -142,7 +142,7 @@ def _main():
     wave2.connect(retries=5)
     current_values = wave2.read()
     print(current_values)
-    client = paho.Client(client_id="rpi5", userdata=None, protocol=paho.MQTTv311)
+    client = paho.Client(callback_api_version=paho.CallbackAPIVersion.VERSION2, client_id="rpi5", userdata=None, protocol=paho.MQTTv311)
     client.username_pw_set(args.MQTT_USER,args.MQTT_PASSWORD)
     client.connect(args.MQTT_IP, 1883)
     client.publish("/airthingswave/basement/RadonSTA", payload=current_values.radon_sta, qos=0)
