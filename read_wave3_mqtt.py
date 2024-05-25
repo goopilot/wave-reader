@@ -23,11 +23,12 @@
 # https://airthings.com
 
 import bluepy.btle as btle
-import argparse
+# import argparse
 import signal
 import struct
 import sys
 import time
+import os
 import paho.mqtt.client as paho
 from paho import mqtt
 
@@ -117,20 +118,26 @@ def _parse_serial_number(manufacturer_data):
             return SN
 
 
-def _argparser():
-    parser = argparse.ArgumentParser(prog="read_wave2", description="Script for reading current values from a 2nd Gen Wave product")
-    parser.add_argument("SERIAL_NUMBER", type=int, help="Airthings device serial number found under the magnetic backplate.")
-    parser.add_argument("SAMPLE_PERIOD", type=int, default=60, help="Time in seconds between reading the current values")
-    parser.add_argument("MQTT_IP", type=str, help="MQTT Broker IP")
-    parser.add_argument("MQTT_USER", type=str, help="MQTT Broker User Name")
-    parser.add_argument("MQTT_PASSWORD", type=str, help="MQTT Broker Password")
-    args = parser.parse_args()
-    return args
+# def _argparser():
+#     parser = argparse.ArgumentParser(prog="read_wave2", description="Script for reading current values from a 2nd Gen Wave product")
+#     parser.add_argument("SERIAL_NUMBER", type=int, help="Airthings device serial number found under the magnetic backplate.")
+#     parser.add_argument("SAMPLE_PERIOD", type=int, default=60, help="Time in seconds between reading the current values")
+#     parser.add_argument("MQTT_IP", type=str, help="MQTT Broker IP")
+#     parser.add_argument("MQTT_USER", type=str, help="MQTT Broker User Name")
+#     parser.add_argument("MQTT_PASSWORD", type=str, help="MQTT Broker Password")
+#     args = parser.parse_args()
+#     return args
 
 
 def _main():
-    args = _argparser()
-    wave2 = Wave2(args.SERIAL_NUMBER)
+    # args = _argparser()
+    SERIAL_NUMBER = os.getenv('SERIAL_NUMBER')
+    MQTT_USER = os.getenv('MQTT_USER')
+    MQTT_PASSWORD = int(os.getenv('MQTT_PASSWORD'))*60
+    MQTT_IP = os.getenv('MQTT_IP')
+    SAMPLE_PERIOD = os.getenv('SAMPLE_PERIOD')
+    
+    wave2 = Wave2(SERIAL_NUMBER)
 
     def _signal_handler(sig, frame):
         wave2.disconnect()
@@ -141,9 +148,10 @@ def _main():
     while True:
         wave2.connect(retries=5)
         current_values = wave2.read()
+        print(current_values)
         client = paho.Client(callback_api_version=paho.CallbackAPIVersion.VERSION2, client_id="rpi5", userdata=None, protocol=paho.MQTTv311)
-        client.username_pw_set(args.MQTT_USER,args.MQTT_PASSWORD)
-        client.connect(args.MQTT_IP, 1883)
+        client.username_pw_set(MQTT_USER,MQTT_PASSWORD)
+        client.connect(MQTT_IP, 1883)
         client.publish("/airthingswave/basement/RadonSTA", payload=current_values.radon_sta, qos=0)
         client.publish("/airthingswave/basement/RadonLTA", payload=current_values.radon_lta, qos=0)
         client.publish("/airthingswave/basement/Humidity", payload=current_values.humidity, qos=0)
@@ -151,7 +159,7 @@ def _main():
         client.disconnect()
 
         wave2.disconnect()
-        time.sleep(args.SAMPLE_PERIOD)
+        time.sleep(SAMPLE_PERIOD)
 
 
 if __name__ == "__main__":
