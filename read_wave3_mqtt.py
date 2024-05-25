@@ -64,6 +64,7 @@ class Wave2():
             tries += 1
             if self.mac_addr is None:
                 self.mac_addr = self.discover()
+                print(self.mac_addr)
             try:
                 self._periph = btle.Peripheral(self.mac_addr)
                 self._char = self._periph.getCharacteristics(uuid=self.CURR_VAL_UUID)[0]
