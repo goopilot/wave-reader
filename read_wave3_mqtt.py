@@ -135,6 +135,7 @@ def _main():
     MQTT_USER = os.getenv('MQTT_USER')
     MQTT_PASSWORD = os.getenv('MQTT_PASSWORD')
     MQTT_IP = os.getenv('MQTT_IP')
+    MQTT_PORT = int(os.getenv('MQTT_PORT'))
     SAMPLE_PERIOD = int(os.getenv('SAMPLE_PERIOD'))
     
     wave2 = Wave2(SERIAL_NUMBER)
@@ -151,7 +152,7 @@ def _main():
         print(current_values)
         client = paho.Client(callback_api_version=paho.CallbackAPIVersion.VERSION2, client_id="rpi5", userdata=None, protocol=paho.MQTTv311)
         client.username_pw_set(MQTT_USER,MQTT_PASSWORD)
-        client.connect(MQTT_IP, 1883)
+        client.connect(MQTT_IP, MQTT_PORT)
         client.publish("/airthingswave/basement/RadonSTA", payload=current_values.radon_sta, qos=0)
         client.publish("/airthingswave/basement/RadonLTA", payload=current_values.radon_lta, qos=0)
         client.publish("/airthingswave/basement/Humidity", payload=current_values.humidity, qos=0)
